@@ -20,6 +20,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/protected', isLoggedIn, (req, res) =>  {
+  console.log('Display Name:', req.user.displayName);
+  console.log('Email:', req.user.emails[0].value);
+  console.log('Profile Photo:', req.user.photos[0].value);
   res.send(`Hello ${req.user.displayName}`);
 });
 
