@@ -1,7 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-require('dotenv').config();
+const mongoose = require('mongoose');
+const connectDB = require('./config/dbConn');
+
+// Connect to db
+connectDB();
 
 require('./auth');
 
@@ -53,6 +58,10 @@ app.get('/logout', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server started on port 3000');
-});
+mongoose.connection.once('open', () => {
+  console.log('Connected to MongoDB');
+  app.listen(3000, () => {
+    console.log('Server started on port 3000');
+  });
+})
+
