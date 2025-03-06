@@ -48,9 +48,31 @@ const getAllMessages = async (req, res) => {
     try {
         const allMessages = await Message.aggregate([
             {
-
+                $match: {
+                    $and: [
+                        {
+                            $or: [
+                                {sender: req.user.emails[0].value},
+                                {reciever: req.user.emails[0].value}
+                            ]
+                        },
+                        {
+                            $or: [
+                                {sender: req.query.conversation},
+                                {reciever: req.query.conversation},
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    messageContent: 1
+                }
             }
         ])
+
+        res.status(200).json(allMessages)
     } catch (error) {
         
     }

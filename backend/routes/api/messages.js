@@ -9,5 +9,8 @@ router.route('/newMessage')
 router.route('/chats')
     .get(messageController.getAllChats)
 
+router.route('/messages')
+    .get(messageController.getAllMessages)
+
 
 module.exports = router;
