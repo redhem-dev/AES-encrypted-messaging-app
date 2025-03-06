@@ -8,13 +8,15 @@ const connectDB = require('./config/dbConn');
 // Connect to db
 connectDB();
 
-require('./auth');
+require('./routes/auth');
 
 function isLoggedIn(req, res, next) {
-  req.user? next() : res.sendStatus(401);
+  req.user? next() : res.sendStatus(401).redirect('/');
 }
 
 const app = express();
+
+app.use(express.json());
 
 app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(passport.initialize());
@@ -57,6 +59,9 @@ app.get('/logout', (req, res) => {
     res.redirect('/protected');
   });
 });
+
+app.use('/', require('./routes/api/messages'));
+
 
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
