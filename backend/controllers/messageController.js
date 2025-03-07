@@ -1,4 +1,7 @@
 const Message = require('../model/Message');
+const {encrypt, decrypr} = require('../utils/cryptoUtils');
+const crypto = require('crypto');
+
 
 const getAllChats = async (req, res) => {
     
@@ -88,15 +91,21 @@ const createNewMessage = async (req, res) => {
         sender: req.body.sender,
         reciever: req.body.reciever,
         timeStamp: timeNow,
-        messageContent: req.body.messageContent
+        messageContent: req.body.messageContent,
+        key: req.body.key
     }
     try {
+        
+        const messageContentBuffer = Buffer.from(newMessage.messageContent);
+
+        const encryptedMessage = encrypt(messageContentBuffer, newMessage.key);
 
         const result = await Message.create({
             "sender": newMessage.sender,
             "reciever": newMessage.reciever,
             "timestamp": newMessage.timeStamp,
-            "messageContent": newMessage.messageContent
+            "messageContent": encryptedMessage.encryptedData,
+            "iv": encryptedMessage.iv
         })
 
         res.status(201).json(result);
