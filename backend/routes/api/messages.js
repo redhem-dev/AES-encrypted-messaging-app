@@ -12,5 +12,8 @@ router.route('/chats')
 router.route('/messages')
     .get(messageController.getAllMessages)
 
+router.route('/decryptedMessages')
+    .get(messageController.decryptAllMessages)
+
 
 module.exports = router;

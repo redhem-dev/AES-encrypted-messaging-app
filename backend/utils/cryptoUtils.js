@@ -11,10 +11,11 @@ function encrypt(text, key){
     return {iv: iv.toString('hex'), encryptedData: encrypted.toString('hex')};
 }
 
-function decrypt(text, key){
-    let iv = Buffer.from(text.iv, 'hex');
-    let encryptedText = Buffer.from(text.encryptedData, 'hex');
-    let decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
+function decrypt(text, key, iv){
+    iv = Buffer.from(iv, 'hex');
+    let encryptedText = Buffer.from(text, 'hex');
+    const keyHashed = crypto.createHash('sha256').update(key).digest();
+    let decipher = crypto.createDecipheriv(algorithm, keyHashed, iv);
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return {decryptedData: decrypted.toString()};
