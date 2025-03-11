@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import './App.css'
 import ChatComponent from './components/Chat';
+import Login from './components/Login';
 
-const App = () => {
+function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="h-screen overflow-hidden">
-        <ChatComponent/>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/chat" element={<ChatComponent />} />
+      </Routes>
+    </BrowserRouter>
   );
-};
+}
 
 export default App
+  

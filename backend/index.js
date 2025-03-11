@@ -4,6 +4,7 @@ const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
+const cors = require('cors');
 
 // Connect to db
 connectDB();
@@ -11,27 +12,26 @@ connectDB();
 require('./routes/auth');
 
 function isLoggedIn(req, res, next) {
-  req.user? next() : res.sendStatus(401).redirect('/');
+  if (req.user) {
+    next();
+  } else {
+    res.redirect('/');
+  }
 }
 
 const app = express();
 
 app.use(express.json());
 
-app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', (req, res) => {
-  res.send('<a href="/auth/google">Authenticate with Google</a>');
-});
-
-app.get('/protected', isLoggedIn, (req, res) =>  {
-  console.log('Display Name:', req.user.displayName);
-  console.log('Email:', req.user.emails[0].value);
-  console.log('Profile Photo:', req.user.photos[0].value);
-  res.send(`Hello ${req.user.displayName}`);
-});
 
 app.get('/auth/google', 
   passport.authenticate('google', { scope: ['email', 'profile'] })
@@ -39,14 +39,17 @@ app.get('/auth/google',
 
 app.get('/google/callback', 
   passport.authenticate('google', {
-    successRedirect: '/protected',
-    failureRedirect: '/auth/failure',
+    successRedirect: 'http://localhost:5173/chat',
+    failureRedirect: 'http://localhost:5173/login',
   })
 );
 
-app.get('/auth/failure', (req, res) => {
-  res.send('Something went wrong!');
+app.get('/protected', isLoggedIn, (req, res) =>  {
+  console.log('Display Name:', req.user.displayName);
+  console.log('Email:', req.user.emails[0].value);
+  res.send(`Hello ${req.user.displayName}`);
 });
+
 
 app.get('/logout', (req, res) => {
   req.logout(function(err) {
@@ -56,7 +59,7 @@ app.get('/logout', (req, res) => {
     }
     req.session.destroy();
     res.clearCookie('connect.sid');
-    res.redirect('/protected');
+    res.redirect('http://localhost:5173/');
   });
 });
 

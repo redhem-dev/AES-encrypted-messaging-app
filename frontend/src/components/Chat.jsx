@@ -10,11 +10,10 @@ const ChatComponent = () => {
   const [decryptionKey, setDecryptionKey] = useState('');
   
   const [chatList, setChatList] = useState([
-    { id: 1, name: 'Alice', lastMessage: 'Hello there!' },
-    { id: 2, name: 'Bob', lastMessage: 'How are you?' },
-    { id: 3, name: 'Charlie', lastMessage: 'See you later!' }
-  ]);
-
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob'},
+    { id: 3, name: 'Charlie'}
+  ]); 
   const handleSelectChat = (chatId) => {
     setSelectedChat(chatId);
   };
@@ -79,10 +78,10 @@ const ChatComponent = () => {
         <div className="overflow-y-auto flex-grow">
           {chatList.map(chat => (
             <div 
-              key={chat.id} 
+              key={chat.name} 
               className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-indigo-50 transition-colors duration-150
-                ${selectedChat === chat.id ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : ''}`}
-              onClick={() => handleSelectChat(chat.id)}
+                ${selectedChat === chat.name ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : ''}`}
+              onClick={() => handleSelectChat(chat.name)}
             >
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-600 font-medium mr-3">
@@ -103,7 +102,7 @@ const ChatComponent = () => {
           <>
             <div className="bg-white p-4 shadow-sm border-b border-gray-200">
               <h3 className="font-medium text-lg text-gray-800">
-                {chatList.find(chat => chat.id === selectedChat)?.name}
+                {chatList.find(chat => chat.name === selectedChat)?.name}
               </h3>
             </div>
             <div className="flex-grow p-4 overflow-y-auto">
@@ -149,7 +148,7 @@ const ChatComponent = () => {
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Type a message..."
                   className="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyUp={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
                 <button 
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition-colors duration-150 flex items-center"
@@ -195,7 +194,7 @@ const ChatComponent = () => {
       
       {/* Encryption popup */}
       {showEncryptPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 transform transition-all">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Enter Encryption Key</h3>
             <p className="text-sm text-gray-600 mb-4">
