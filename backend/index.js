@@ -40,7 +40,7 @@ app.get('/auth/google',
 app.get('/google/callback', 
   passport.authenticate('google', {
     successRedirect: 'http://localhost:5173/chat',
-    failureRedirect: 'http://localhost:5173/login',
+    failureRedirect: 'http://localhost:5173/',
   })
 );
 
@@ -59,7 +59,7 @@ app.get('/logout', (req, res) => {
     }
     req.session.destroy();
     res.clearCookie('connect.sid');
-    res.redirect('http://localhost:5173/');
+    res.status(200).json({ success: true });
   });
 });
 

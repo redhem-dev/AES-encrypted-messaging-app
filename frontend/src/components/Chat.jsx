@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import baseURL from '../../api/backendBaseURL';
 
 const ChatComponent = () => {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -68,6 +69,20 @@ const ChatComponent = () => {
     setShowDecryptPopup(false);
   };
 
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await baseURL.get('/logout');
+      window.location.href = 'http://localhost:5173/'
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="h-screen flex bg-gray-100">
       {/* Left side - Chat selection */}
@@ -94,6 +109,29 @@ const ChatComponent = () => {
             </div>
           ))}
         </div>
+        
+        <div className="bg-indigo-700 text-white p-4 shadow-md">
+            <button 
+              className="text-xl font-bold w-full text-left flex items-center cursor-pointer hover:text-indigo-200 transition-colors"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
+                  Logging out...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Logout
+                </>
+              )}
+            </button>
+        </div>          
+        
       </div>
       
       {/* Right side - Messages */}
