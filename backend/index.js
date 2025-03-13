@@ -45,8 +45,6 @@ app.get('/google/callback',
 );
 
 app.get('/protected', isLoggedIn, (req, res) =>  {
-  console.log('Display Name:', req.user.displayName);
-  console.log('Email:', req.user.emails[0].value);
   res.send(`Hello ${req.user.displayName}`);
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import baseURL from '../../api/backendBaseURL';
 
 const ChatComponent = () => {
@@ -9,12 +9,27 @@ const ChatComponent = () => {
   const [showDecryptPopup, setShowDecryptPopup] = useState(false);
   const [encryptionKey, setEncryptionKey] = useState('');
   const [decryptionKey, setDecryptionKey] = useState('');
+
+  const [chatList, setChatList] = useState([]);
+
+  useEffect(() => {
+    const getConversations = async () => {
+        try {
+            const conversations = await baseURL.get('/chats', {
+                method: 'GET',
+                withCredentials: true
+            })
+
+            console.log(conversations);
+            setChatList(conversations.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    getConversations();
+  }, []);
   
-  const [chatList, setChatList] = useState([
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob'},
-    { id: 3, name: 'Charlie'}
-  ]); 
+
   const handleSelectChat = (chatId) => {
     setSelectedChat(chatId);
   };
@@ -93,17 +108,17 @@ const ChatComponent = () => {
         <div className="overflow-y-auto flex-grow">
           {chatList.map(chat => (
             <div 
-              key={chat.name} 
+              key={chat.conversation} 
               className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-indigo-50 transition-colors duration-150
-                ${selectedChat === chat.name ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : ''}`}
-              onClick={() => handleSelectChat(chat.name)}
+                ${selectedChat === chat.conversation ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : ''}`}
+              onClick={() => handleSelectChat(chat.conversation)}
             >
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-600 font-medium mr-3">
-                  {chat.name.charAt(0)}
+                  {chat.conversation.charAt(0)}
                 </div>
                 <div className="flex-grow">
-                  <div className="font-semibold text-gray-800">{chat.name}</div>
+                  <div className="font-semibold text-gray-800">{chat.conversation}</div>
                 </div>
               </div>
             </div>
