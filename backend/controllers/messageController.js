@@ -71,7 +71,9 @@ const getAllMessages = async (req, res) => {
             },
             {
                 $project: {
-                    messageContent: 1
+                    messageContent: 1,
+                    sender: 1,
+                    reciever: 1
                 }
             }
         ])
@@ -79,7 +81,7 @@ const getAllMessages = async (req, res) => {
         res.status(200).json(allMessages)
     } catch (error) {
 
-        console.log(erroor);
+        console.log(error);
         
     }
 

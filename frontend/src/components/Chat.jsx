@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import baseURL from '../../api/backendBaseURL';
 
 const ChatComponent = () => {
-  const [selectedChat, setSelectedChat] = useState(null);
+  const [selectedChat, setSelectedChat] = useState('');
   const [messages, setMessages] = useState({});
   const [messageInput, setMessageInput] = useState('');
   const [showEncryptPopup, setShowEncryptPopup] = useState(false);
@@ -11,7 +11,6 @@ const ChatComponent = () => {
   const [decryptionKey, setDecryptionKey] = useState('');
 
   const [chatList, setChatList] = useState([]);
-
   useEffect(() => {
     const getConversations = async () => {
         try {
@@ -28,10 +27,40 @@ const ChatComponent = () => {
     }
     getConversations();
   }, []);
-  
 
-  const handleSelectChat = (chatId) => {
-    setSelectedChat(chatId);
+
+  useEffect(() => {
+    const getAllMessages = async () => {
+      if(selectedChat){
+        try {
+          const response = await baseURL.get(`/messages?conversation=${encodeURIComponent(selectedChat)}`, {
+            withCredentials: true,
+          });
+          
+          console.log(response.data);
+          
+          const formattedMessages = response.data.map(msg => ({
+            id: msg._id,
+            text: msg.messageContent,
+            sender: msg.sender === 'me' ? 'me' : 'other',
+            encrypted: true,
+            timestamp: new Date().toISOString(),
+          }));
+          
+          setMessages(prevMessages => ({
+            ...prevMessages,
+            [selectedChat]: formattedMessages
+          }));
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    getAllMessages();
+  }, [selectedChat]);
+
+  const handleSelectChat = (conversation) => {
+    setSelectedChat(conversation);
   };
 
   const handleSendMessage = () => {
@@ -105,6 +134,7 @@ const ChatComponent = () => {
         <div className="bg-indigo-700 text-white p-4 shadow-md">
           <h2 className="text-xl font-bold">Conversations</h2>
         </div>
+
         <div className="overflow-y-auto flex-grow">
           {chatList.map(chat => (
             <div 
@@ -145,6 +175,8 @@ const ChatComponent = () => {
                 </>
               )}
             </button>
+            
+
         </div>          
         
       </div>
@@ -155,10 +187,10 @@ const ChatComponent = () => {
           <>
             <div className="bg-white p-4 shadow-sm border-b border-gray-200">
               <h3 className="font-medium text-lg text-gray-800">
-                {chatList.find(chat => chat.name === selectedChat)?.name}
+                {selectedChat}
               </h3>
             </div>
-            <div className="flex-grow p-4 overflow-y-auto">
+            <div className="flex-grow p-4 overflow-y-auto flex flex-col justify-end">
               {(messages[selectedChat] || []).length > 0 ? (
                 <div className="flex flex-col space-y-3">
                   {(messages[selectedChat] || []).map(message => (
@@ -173,9 +205,6 @@ const ChatComponent = () => {
                       }`}>
                         <div className="text-sm break-words">
                           {message.decrypted ? message.text : '🔒 Encrypted message'}
-                        </div>
-                        <div className={`text-xs mt-1 ${message.sender === 'me' ? 'text-indigo-100' : 'text-gray-500'}`}>
-                          {new Date(message.timestamp).toLocaleTimeString()}
                         </div>
                       </div>
                     </div>
