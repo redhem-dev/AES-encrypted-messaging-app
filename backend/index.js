@@ -48,6 +48,10 @@ app.get('/protected', isLoggedIn, (req, res) =>  {
   res.send(`Hello ${req.user.displayName}`);
 });
 
+app.get('/getEmail', isLoggedIn, (req, res) => {
+  res.send(`${req.user.emails[0].value}`)
+})
+
 
 app.get('/logout', (req, res) => {
   req.logout(function(err) {

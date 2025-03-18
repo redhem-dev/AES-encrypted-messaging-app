@@ -9,8 +9,28 @@ const ChatComponent = () => {
   const [showDecryptPopup, setShowDecryptPopup] = useState(false);
   const [encryptionKey, setEncryptionKey] = useState('');
   const [decryptionKey, setDecryptionKey] = useState('');
+  const [usersEmail, setUsersEmail] = useState('');
+  
 
   const [chatList, setChatList] = useState([]);
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+        try {
+            const usersEmail = await baseURL.get('/getEmail', {
+                method: 'GET',
+                withCredentials: true
+            })
+            
+            console.log(usersEmail);
+            setUsersEmail(usersEmail.data);
+        } catch (error) {
+            console.log(error);
+        }
+      }
+      getUserEmail();
+  }, []);
+
   useEffect(() => {
     const getConversations = async () => {
         try {
@@ -18,8 +38,6 @@ const ChatComponent = () => {
                 method: 'GET',
                 withCredentials: true
             })
-
-            console.log(conversations);
             setChatList(conversations.data);
         } catch (error) {
             console.log(error);
@@ -30,22 +48,22 @@ const ChatComponent = () => {
 
 
   useEffect(() => {
-    const getAllMessages = async () => {
+    const getAllMessages = async (req) => {
       if(selectedChat){
         try {
           const response = await baseURL.get(`/messages?conversation=${encodeURIComponent(selectedChat)}`, {
             withCredentials: true,
           });
           
-          console.log(response.data);
           
           const formattedMessages = response.data.map(msg => ({
             id: msg._id,
             text: msg.messageContent,
-            sender: msg.sender === 'me' ? 'me' : 'other',
-            encrypted: true,
+            sender: msg.sender === usersEmail ? 'me' : 'other', 
             timestamp: new Date().toISOString(),
           }));
+
+          console.log(formattedMessages);
           
           setMessages(prevMessages => ({
             ...prevMessages,
